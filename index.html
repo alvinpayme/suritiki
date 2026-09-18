@@ -3,95 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suritiki - Maak betaalverzoek</title>
+    <title>Suritiki - Geld overmaken naar Suriname</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-        .card { background: #fff; width: 100%; max-width: 420px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12); }
-        h1 { margin: 0 0 6px; font-size: 30px; color: #059669; }
-        .intro { margin: 0 0 20px; color: #64748b; font-size: 14px; }
-        .field { margin-bottom: 16px; }
-        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #334155; }
-        input, select, button { font: inherit; }
-        input, select { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #fff; color: #0f172a; }
-        input:focus, select:focus { outline: 2px solid #34d399; border-color: #10b981; }
-        .amount-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
-        .submit, .whatsapp { width: 100%; border: 0; border-radius: 10px; color: #fff; font-weight: 700; padding: 12px 16px; cursor: pointer; }
-        .submit { background: #059669; }
-        .submit:hover { background: #047857; }
-        .submit:disabled { opacity: .7; cursor: wait; }
-        .result { margin-top: 24px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px; }
-        .hidden { display: none; }
-        .result-title { margin: 0 0 8px; color: #065f46; font-weight: 700; }
-        #generatedLink { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; padding: 10px 12px; border: 1px solid #a7f3d0; border-radius: 8px; background: #fff; margin-bottom: 10px; }
-        .copy, .whatsapp { width: 100%; border: 0; border-radius: 8px; color: #fff; padding: 10px 12px; cursor: pointer; }
-        .copy { background: #1e293b; }
-        .whatsapp { margin-top: 10px; background: #16a34a; }
-        .whatsapp:hover { background: #15803d; }
-        .message { min-height: 20px; margin-top: 12px; color: #b91c1c; font-size: 14px; font-weight: 600; }
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: Arial, sans-serif; color: #fff; background: linear-gradient(135deg, #075e54, #128c7e 50%, #25d366); }
+        .flyer { width: 100%; max-width: 460px; padding: 42px 24px; text-align: center; border: 4px solid #fff; border-radius: 28px; background: rgba(0, 0, 0, .22); box-shadow: 0 18px 45px rgba(0, 0, 0, .3); }
+        .badge { font-size: 50px; margin-bottom: 10px; }
+        h1 { margin: 0; font-size: clamp(36px, 11vw, 62px); font-weight: 900; letter-spacing: 1px; text-shadow: 3px 3px 0 #075e54; }
+        h2 { margin: 12px 0 22px; font-size: clamp(24px, 7vw, 36px); line-height: 1.1; text-transform: uppercase; }
+        p { margin: 14px 0; font-size: 18px; line-height: 1.45; }
+        .steps { margin: 24px 0; padding: 18px; border-radius: 16px; background: rgba(255, 255, 255, .16); font-size: 17px; font-weight: 700; }
+        .whatsapp-button { display: block; width: 100%; padding: 18px 16px; border-radius: 14px; background: #fff; color: #075e54; font-size: 21px; font-weight: 900; text-decoration: none; text-transform: uppercase; box-shadow: 0 6px 0 #cfeee5; }
+        .whatsapp-button:hover { transform: translateY(2px); box-shadow: 0 4px 0 #cfeee5; }
+        .small { margin-top: 22px; font-size: 13px; opacity: .9; }
     </style>
 </head>
 <body>
-    <main class="card">
-        <h1>Suritiki</h1>
-        <p class="intro">Maak makkelijk een betaalverzoek voor Suriname en Nederland.</p>
-
-        <form id="paymentForm">
-            <div class="field">
-                <label for="name">Jouw naam (ontvanger)</label>
-                <input id="name" type="text" required placeholder="Bijv. Deelsy">
-            </div>
-
-            <div class="field">
-                <label for="amount">Bedrag</label>
-                <div class="amount-row">
-                    <input id="amount" type="number" step="0.01" min="0.01" required placeholder="0,00">
-                    <select id="currency" aria-label="Valuta">
-                        <option value="SRD">SRD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="USD">USD</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="bank">Jouw bank (in Suriname)</label>
-                <select id="bank">
-                    <option value="DSB">De Surinaamsche Bank (DSB)</option>
-                    <option value="Hakrinbank">Hakrinbank</option>
-                    <option value="Republic Bank">Republic Bank</option>
-                    <option value="Fina Bank">Fina Bank</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="account">Jouw rekeningnummer</label>
-                <input id="account" type="text" required placeholder="Bijv. 12.34.56.789">
-            </div>
-
-            <div class="field">
-                <label for="description">Omschrijving</label>
-                <input id="description" type="text" maxlength="200" placeholder="Bijv. Voor de boodschappen">
-            </div>
-
-            <div class="field">
-                <label for="paymentUrl">Tikkie-link (optioneel)</label>
-                <input id="paymentUrl" type="url" placeholder="https://tikkie.me/pay/...">
-            </div>
-
-            <button id="submitBtn" type="submit" class="submit">Maak Suritiki-link</button>
-            <p id="statusMessage" class="message" role="alert"></p>
-        </form>
-
-        <section id="result" class="result hidden" aria-live="polite">
-            <p class="result-title">Jouw Suritiki-link is klaar! 🎉</p>
-            <input id="generatedLink" type="text" readonly aria-label="Gegenereerde link">
-            <button id="copyBtn" type="button" class="copy">Kopieer link</button>
-            <button id="whatsappBtn" type="button" class="whatsapp">Deel via WhatsApp</button>
-        </section>
+    <main class="flyer">
+        <div class="badge">🇸🇷 🇳🇱</div>
+        <h1>SURITIKI</h1>
+        <h2>Geld overmaken naar Suriname?</h2>
+        <p>Snel en eenvoudig geld laten overmaken naar een Surinaamse bankrekening.</p>
+        <div class="steps">1. Klik op de WhatsApp-knop<br>2. Stuur het bedrag dat je wilt overmaken<br>3. Je ontvangt daarna een Tikkie</div>
+        <a class="whatsapp-button" href="https://wa.me/31626193693?text=Hoi%20Suritiki%2C%20ik%20wil%20geld%20overmaken%20naar%20Suriname.%20Het%20bedrag%20is%3A%20%E2%82%AC%20" target="_blank" rel="noopener noreferrer">💬 Stuur bedrag via WhatsApp</a>
+        <p class="small">Je wordt direct doorgestuurd naar WhatsApp.</p>
     </main>
-
-    <script src="config.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>
