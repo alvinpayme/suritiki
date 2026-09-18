@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://<jouw-project-id>.supabase.co";
-const SUPABASE_KEY = "<https://gbnqhzczwqpjiklbockm.supabase.co/rest/v1/>";
+const SUPABASE_KEY = "<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibnFoemN6d3FwamlrbGJvY2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3MDUwODIsImV4cCI6MjEwNTI4MTA4Mn0.HNm-udtBFsWQSomkKpIAKgrICM_Qoz-klC_5B2z1vYE>";
 
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
