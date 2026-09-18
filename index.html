@@ -6,178 +6,52 @@
     <title>Suritiki - Maak betaalverzoek</title>
     <style>
         * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background: #f1f5f9;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .card {
-            background: #fff;
-            width: 100%;
-            max-width: 420px;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
-        }
-        h1 {
-            margin: 0 0 6px;
-            font-size: 30px;
-            color: #059669;
-        }
-        .intro {
-            margin: 0 0 20px;
-            color: #64748b;
-            font-size: 14px;
-        }
-        .field {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #334155;
-        }
-        input, select, button {
-            font: inherit;
-        }
-        input, select {
-            width: 100%;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 12px;
-            background: #fff;
-            color: #0f172a;
-        }
-        input:focus, select:focus {
-            outline: 2px solid #34d399;
-            border-color: #10b981;
-        }
-        .amount-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 8px;
-        }
-        .submit {
-            width: 100%;
-            border: 0;
-            border-radius: 10px;
-            background: #059669;
-            color: #fff;
-            font-weight: 700;
-            padding: 12px 16px;
-            cursor: pointer;
-        }
-        .submit:hover {
-            background: #047857;
-        }
-        .submit:disabled {
-            opacity: 0.7;
-            cursor: wait;
-        }
-        .result {
-            margin-top: 24px;
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 12px;
-            padding: 16px;
-        }
-        .hidden {
-            display: none;
-        }
-        .result-title {
-            margin: 0 0 8px;
-            color: #065f46;
-            font-weight: 700;
-        }
-        #generatedLink {
-            width: 100%;
-            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            font-size: 12px;
-            padding: 10px 12px;
-            border: 1px solid #a7f3d0;
-            border-radius: 8px;
-            background: #fff;
-            margin-bottom: 10px;
-        }
-        .copy {
-            width: 100%;
-            border: 0;
-            border-radius: 8px;
-            background: #1e293b;
-            color: #fff;
-            padding: 10px 12px;
-            cursor: pointer;
-        }
-        .message {
-            min-height: 20px;
-            margin-top: 12px;
-            color: #b91c1c;
-            font-size: 14px;
-            font-weight: 600;
-        }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .card { background: #fff; width: 100%; max-width: 420px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(15, 23, 42, .12); }
+        h1 { margin: 0 0 6px; font-size: 30px; color: #059669; }
+        .intro { margin: 0 0 20px; color: #64748b; font-size: 14px; }
+        .field { margin-bottom: 16px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        input, select, button { font: inherit; }
+        input, select { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #fff; color: #0f172a; }
+        input:focus, select:focus { outline: 2px solid #34d399; border-color: #10b981; }
+        .amount-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+        .submit, .whatsapp { width: 100%; border: 0; border-radius: 10px; color: #fff; font-weight: 700; padding: 12px 16px; cursor: pointer; }
+        .submit { background: #059669; }
+        .submit:hover { background: #047857; }
+        .submit:disabled { opacity: .7; cursor: wait; }
+        .result { margin-top: 24px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px; }
+        .hidden { display: none; }
+        .result-title { margin: 0 0 8px; color: #065f46; font-weight: 700; }
+        #generatedLink { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; padding: 10px 12px; border: 1px solid #a7f3d0; border-radius: 8px; background: #fff; margin-bottom: 10px; }
+        .copy, .whatsapp { width: 100%; border: 0; border-radius: 8px; color: #fff; padding: 10px 12px; cursor: pointer; }
+        .copy { background: #1e293b; }
+        .whatsapp { margin-top: 10px; background: #16a34a; }
+        .whatsapp:hover { background: #15803d; }
+        .message { min-height: 20px; margin-top: 12px; color: #b91c1c; font-size: 14px; font-weight: 600; }
     </style>
 </head>
 <body>
     <main class="card">
         <h1>Suritiki</h1>
         <p class="intro">Maak makkelijk een betaalverzoek voor Suriname en Nederland.</p>
-
         <form id="paymentForm">
-            <div class="field">
-                <label for="name">Jouw naam (ontvanger)</label>
-                <input id="name" type="text" required placeholder="Bijv. Deelsy">
-            </div>
-
-            <div class="field">
-                <label for="amount">Bedrag</label>
-                <div class="amount-row">
-                    <input id="amount" type="number" step="0.01" min="0.01" required placeholder="0,00">
-                    <select id="currency" aria-label="Valuta">
-                        <option value="SRD">SRD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="USD">USD</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="bank">Jouw bank (in Suriname)</label>
-                <select id="bank">
-                    <option value="DSB">De Surinaamsche Bank (DSB)</option>
-                    <option value="Hakrinbank">Hakrinbank</option>
-                    <option value="Republic Bank">Republic Bank</option>
-                    <option value="Fina Bank">Fina Bank</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="account">Jouw rekeningnummer</label>
-                <input id="account" type="text" required placeholder="Bijv. 12.34.56.789">
-            </div>
-
-            <div class="field">
-                <label for="description">Omschrijving</label>
-                <input id="description" type="text" maxlength="200" placeholder="Bijv. Voor de boodschappen">
-            </div>
-
+            <div class="field"><label for="name">Jouw naam (ontvanger)</label><input id="name" type="text" required placeholder="Bijv. Deelsy"></div>
+            <div class="field"><label for="amount">Bedrag</label><div class="amount-row"><input id="amount" type="number" step="0.01" min="0.01" required placeholder="0,00"><select id="currency" aria-label="Valuta"><option value="SRD">SRD</option><option value="EUR">EUR</option><option value="USD">USD</option></select></div></div>
+            <div class="field"><label for="bank">Jouw bank (in Suriname)</label><select id="bank"><option value="DSB">De Surinaamsche Bank (DSB)</option><option value="Hakrinbank">Hakrinbank</option><option value="Republic Bank">Republic Bank</option><option value="Fina Bank">Fina Bank</option></select></div>
+            <div class="field"><label for="account">Jouw rekeningnummer</label><input id="account" type="text" required placeholder="Bijv. 12.34.56.789"></div>
+            <div class="field"><label for="description">Omschrijving</label><input id="description" type="text" maxlength="200" placeholder="Bijv. Voor de boodschappen"></div>
+            <div class="field"><label for="paymentUrl">Tikkie-link (optioneel)</label><input id="paymentUrl" type="url" placeholder="https://tikkie.me/pay/..."></div>
             <button id="submitBtn" type="submit" class="submit">Maak Suritiki-link</button>
             <p id="statusMessage" class="message" role="alert"></p>
         </form>
-
         <section id="result" class="result hidden" aria-live="polite">
             <p class="result-title">Jouw Suritiki-link is klaar! 🎉</p>
             <input id="generatedLink" type="text" readonly aria-label="Gegenereerde link">
             <button id="copyBtn" type="button" class="copy">Kopieer link</button>
+            <button id="whatsappBtn" type="button" class="whatsapp">Deel via WhatsApp</button>
         </section>
     </main>
-
     <script src="config.js"></script>
     <script src="app.js"></script>
 </body>
