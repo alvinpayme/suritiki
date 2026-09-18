@@ -1,3 +1,6 @@
+const KOERS_SRD_NAAR_EUR = 1 / 41.5;
+const KOERS_USD_NAAR_EUR = 0.92;
+
 (() => {
     'use strict';
 
@@ -6,64 +9,61 @@
     const result = document.getElementById('result');
     const linkInput = document.getElementById('generatedLink');
     const copyBtn = document.getElementById('copyBtn');
-    const whatsappBtn = document.getElementById('whatsappBtn');
     const submitBtn = document.getElementById('submitBtn');
     const statusMessage = document.getElementById('statusMessage');
 
-    const showError = (message) => { statusMessage.textContent = message; };
-    const isConfigured = () => config.SUPABASE_URL && config.SUPABASE_KEY
-        && /^https:\/\/[^/]+\.supabase\.co$/.test(config.SUPABASE_URL)
-        && !config.SUPABASE_KEY.includes('JOUW-SUPABASE-ANON-KEY');
+    if (!form) return;
 
-    const createId = () => {
-        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
-            const random = Math.random() * 16 | 0;
-            const value = character === 'x' ? random : (random & 0x3 | 0x8);
-            return value.toString(16);
-        });
+    const showError = (message) => {
+        if (statusMessage) statusMessage.textContent = message;
     };
 
-    if (!form) return;
+    const isConfigured = () => !!(
+        config.SUPABASE_URL &&
+        config.SUPABASE_KEY &&
+        !config.SUPABASE_URL.includes('JOUW-PROJECT-REF') &&
+        !config.SUPABASE_KEY.includes('JOUW-SUPABASE-ANON-KEY')
+    );
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        statusMessage.textContent = '';
-        result.classList.add('hidden');
-        if (whatsappBtn) whatsappBtn.classList.add('hidden');
+        if (statusMessage) statusMessage.textContent = '';
+        if (result) result.classList.add('hidden');
 
         if (!isConfigured()) {
-            showError('Controleer SUPABASE_URL en SUPABASE_KEY in config.js.');
+            showError('Vul eerst SUPABASE_URL en SUPABASE_KEY in config.js in.');
             return;
         }
 
-        const name = document.getElementById('name').value.trim();
-        const account = document.getElementById('account').value.trim();
-        const paymentLink = document.getElementById('paymentLink')?.value.trim() || '';
         const originalAmount = Number.parseFloat(document.getElementById('amount').value);
-
-        if (!name || !account || !paymentLink || !Number.isFinite(originalAmount) || originalAmount <= 0) {
-            showError('Vul alle verplichte velden in, inclusief een geldige Tikkie-link.');
+        if (!Number.isFinite(originalAmount) || originalAmount <= 0) {
+            showError('Vul een geldig bedrag groter dan nul in.');
             return;
         }
 
         const currency = document.getElementById('currency').value;
-        const euroAmount = Number((currency === 'SRD' ? originalAmount / 35 : currency === 'USD' ? originalAmount * 0.92 : originalAmount).toFixed(2));
-        const id = createId();
+        let euroAmount = originalAmount;
+
+        if (currency === 'SRD') {
+            euroAmount = originalAmount * KOERS_SRD_NAAR_EUR;
+        } else if (currency === 'USD') {
+            euroAmount = originalAmount * KOERS_USD_NAAR_EUR;
+        }
+
+        euroAmount = Number(euroAmount.toFixed(2));
+
         const payload = {
-            id,
-            naam: name,
+            naam: document.getElementById('name').value.trim(),
             bedrag: euroAmount,
             bank: document.getElementById('bank').value,
-            rekeningnummer: account,
-            omschrijving: document.getElementById('description').value.trim(),
-            betaallink: paymentLink
+            rekeningnummer: document.getElementById('account').value.trim(),
+            omschrijving: document.getElementById('description').value.trim()
         };
 
         submitBtn.disabled = true;
+
         try {
-            const endpoint = `${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken?select=id`;
-            const response = await fetch(endpoint, {
+            const response = await fetch(`${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken`, {
                 method: 'POST',
                 headers: {
                     apikey: config.SUPABASE_KEY,
@@ -73,22 +73,21 @@
                 },
                 body: JSON.stringify(payload)
             });
+
             const data = await response.json().catch(() => null);
+
             if (!response.ok) {
-                const detail = data?.message || data?.hint || data?.details || `HTTP ${response.status}`;
-                throw new Error(detail);
+                throw new Error(data?.message || data?.hint || `HTTP ${response.status}`);
             }
 
-            const savedId = data?.[0]?.id || data?.id || id;
+            const record = Array.isArray(data) ? data[0] : data;
+            if (!record?.id) {
+                throw new Error('De database gaf geen ID terug.');
+            }
+
             const paymentUrl = new URL('betaal.html', window.location.href);
-            paymentUrl.searchParams.set('id', savedId);
+            paymentUrl.searchParams.set('id', record.id);
             linkInput.value = paymentUrl.href;
-
-            if (whatsappBtn) {
-                whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`Bekijk mijn Suritiki-betaalverzoek: ${paymentUrl.href}`)}`;
-                whatsappBtn.classList.remove('hidden');
-            }
-
             result.classList.remove('hidden');
         } catch (error) {
             showError(`Opslaan mislukt: ${error.message}`);
@@ -97,12 +96,14 @@
         }
     });
 
-    if (copyBtn) {
+    if (copyBtn && linkInput) {
         copyBtn.addEventListener('click', async () => {
             try {
                 await navigator.clipboard.writeText(linkInput.value);
                 copyBtn.textContent = 'Gekopieerd!';
-                setTimeout(() => { copyBtn.textContent = 'Kopieer link'; }, 1500);
+                setTimeout(() => {
+                    copyBtn.textContent = 'Kopieer link';
+                }, 1500);
             } catch {
                 linkInput.select();
                 document.execCommand('copy');
