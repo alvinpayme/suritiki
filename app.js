@@ -12,8 +12,17 @@
 
     const showError = (message) => { statusMessage.textContent = message; };
     const isConfigured = () => config.SUPABASE_URL && config.SUPABASE_KEY
-        && !config.SUPABASE_URL.includes('JOUW-PROJECT-REF')
+        && /^https:\/\/[^/]+\.supabase\.co$/.test(config.SUPABASE_URL)
         && !config.SUPABASE_KEY.includes('JOUW-SUPABASE-ANON-KEY');
+
+    const createId = () => {
+        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+            const random = Math.random() * 16 | 0;
+            const value = character === 'x' ? random : (random & 0x3 | 0x8);
+            return value.toString(16);
+        });
+    };
 
     if (!form) return;
 
@@ -24,29 +33,34 @@
         whatsappBtn.classList.add('hidden');
 
         if (!isConfigured()) {
-            showError('Vul eerst SUPABASE_URL en SUPABASE_KEY in config.js in.');
+            showError('Controleer SUPABASE_URL en SUPABASE_KEY in config.js.');
             return;
         }
 
+        const name = document.getElementById('name').value.trim();
+        const account = document.getElementById('account').value.trim();
         const originalAmount = Number.parseFloat(document.getElementById('amount').value);
-        if (!Number.isFinite(originalAmount) || originalAmount <= 0) {
-            showError('Vul een geldig bedrag groter dan nul in.');
+        if (!name || !account || !Number.isFinite(originalAmount) || originalAmount <= 0) {
+            showError('Vul alle verplichte velden en een geldig bedrag in.');
             return;
         }
 
         const currency = document.getElementById('currency').value;
         const euroAmount = Number((currency === 'SRD' ? originalAmount / 35 : currency === 'USD' ? originalAmount * 0.92 : originalAmount).toFixed(2));
+        const id = createId();
         const payload = {
-            naam: document.getElementById('name').value.trim(),
+            id,
+            naam: name,
             bedrag: euroAmount,
             bank: document.getElementById('bank').value,
-            rekeningnummer: document.getElementById('account').value.trim(),
+            rekeningnummer: account,
             omschrijving: document.getElementById('description').value.trim()
         };
 
         submitBtn.disabled = true;
         try {
-            const response = await fetch(`${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken`, {
+            const endpoint = `${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken?select=id`;
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     apikey: config.SUPABASE_KEY,
@@ -57,12 +71,16 @@
                 body: JSON.stringify(payload)
             });
             const data = await response.json().catch(() => null);
-            if (!response.ok) throw new Error(data?.message || data?.hint || `HTTP ${response.status}`);
-            const record = Array.isArray(data) ? data[0] : data;
-            if (!record?.id) throw new Error('De database gaf geen ID terug.');
+            if (!response.ok) {
+                const detail = data?.message || data?.hint || data?.details || `HTTP ${response.status}`;
+                throw new Error(detail);
+            }
 
+            // The ID is generated before saving, so it is available even when
+            // the REST response contains no representation because of API settings.
+            const savedId = data?.[0]?.id || data?.id || id;
             const paymentUrl = new URL('betaal.html', window.location.href);
-            paymentUrl.searchParams.set('id', record.id);
+            paymentUrl.searchParams.set('id', savedId);
             linkInput.value = paymentUrl.href;
             whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`Bekijk mijn Suritiki-betaalverzoek: ${paymentUrl.href}`)}`;
             whatsappBtn.classList.remove('hidden');
