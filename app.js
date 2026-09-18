@@ -92,4 +92,8 @@ copyBtn.addEventListener('click', function() {
     linkInput.setSelectionRange(0, 99999); 
     navigator.clipboard.writeText(linkInput.value);
     
-    copyBtn.innerText = "Gekopie
+    copyBtn.innerText = "Gekopieerd! ✅";
+    setTimeout(() => {
+        copyBtn.innerText = "Kopieer link";
+    }, 2000);
+});
