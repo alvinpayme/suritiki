@@ -1,54 +1,83 @@
-const SUPABASE_URL = "https://<jouw-project-id>.supabase.co";
-const SUPABASE_KEY = "<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibnFoemN6d3FwamlrbGJvY2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3MDUwODIsImV4cCI6MjEwNTI4MTA4Mn0.HNm-udtBFsWQSomkKpIAKgrICM_Qoz-klC_5B2z1vYE>";
+(() => {
+    'use strict';
 
-form.addEventListener('submit', async function(e) {
-    e.preventDefault();
+    const config = window.SURITIKI_CONFIG || {};
+    const form = document.getElementById('paymentForm');
+    const result = document.getElementById('result');
+    const linkInput = document.getElementById('generatedLink');
+    const copyBtn = document.getElementById('copyBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusMessage = document.getElementById('statusMessage');
 
-    const name = document.getElementById('name').value;
-    const originalAmount = parseFloat(document.getElementById('amount').value);
-    const currency = document.getElementById('currency').value;
-    const bank = document.getElementById('bank').value;
-    const account = document.getElementById('account').value;
-    const description = document.getElementById('description').value;
+    const showError = (message) => { statusMessage.textContent = message; };
+    const isConfigured = () => config.SUPABASE_URL && config.SUPABASE_KEY
+        && !config.SUPABASE_URL.includes('JOUW-PROJECT-REF')
+        && !config.SUPABASE_KEY.includes('JOUW-SUPABASE-ANON-KEY');
 
-    let euroAmount = originalAmount;
+    if (!form) return;
 
-    if (currency === 'SRD') euroAmount = originalAmount * (1/35);
-    if (currency === 'USD') euroAmount = originalAmount * 0.92;
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        statusMessage.textContent = '';
+        result.classList.add('hidden');
 
-    euroAmount = parseFloat(euroAmount.toFixed(2));
+        if (!isConfigured()) {
+            showError('Vul eerst SUPABASE_URL en SUPABASE_KEY in config.js in.');
+            return;
+        }
 
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/betaalverzoeken`, {
-        method: 'POST',
-        headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-            naam: name,
+        const originalAmount = Number.parseFloat(document.getElementById('amount').value);
+        if (!Number.isFinite(originalAmount) || originalAmount <= 0) {
+            showError('Vul een geldig bedrag groter dan nul in.');
+            return;
+        }
+
+        const currency = document.getElementById('currency').value;
+        const euroAmount = Number((currency === 'SRD' ? originalAmount / 35 : currency === 'USD' ? originalAmount * 0.92 : originalAmount).toFixed(2));
+        const payload = {
+            naam: document.getElementById('name').value.trim(),
             bedrag: euroAmount,
-            bank: bank,
-            rekeningnummer: account,
-            omschrijving: description
-        })
+            bank: document.getElementById('bank').value,
+            rekeningnummer: document.getElementById('account').value.trim(),
+            omschrijving: document.getElementById('description').value.trim()
+        };
+
+        submitBtn.disabled = true;
+        try {
+            const response = await fetch(`${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken`, {
+                method: 'POST',
+                headers: {
+                    apikey: config.SUPABASE_KEY,
+                    Authorization: `Bearer ${config.SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    Prefer: 'return=representation'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(data?.message || data?.hint || `HTTP ${response.status}`);
+            const record = Array.isArray(data) ? data[0] : data;
+            if (!record?.id) throw new Error('De database gaf geen ID terug.');
+
+            const paymentUrl = new URL('betaal.html', window.location.href);
+            paymentUrl.searchParams.set('id', record.id);
+            linkInput.value = paymentUrl.href;
+            result.classList.remove('hidden');
+        } catch (error) {
+            showError(`Opslaan mislukt: ${error.message}`);
+        } finally {
+            submitBtn.disabled = false;
+        }
     });
 
-    const data = await response.json();
-
-    if (data && data.length > 0) {
-        const databaseId = data[0].id;
-        const currentUrl = window.location.href.replace('index.html', '');
-        const generatedLink = `${currentUrl}betaal.html?id=${databaseId}`;
-
-        linkInput.value = generatedLink;
-        resultDiv.classList.add('visible');
-
-        const whatsappBericht = `Hoi! Hier is een Suritiki betaalverzoek van ${name}. Of je ${currency} ${originalAmount} (omgerekend € ${euroAmount}) wilt overmaken voor "${description || 'Betaalverzoek'}". Betaal via deze link: ${generatedLink}`;
-
-        whatsappBtn.onclick = function() {
-            window.open(`https://wa.me/?text=${encodeURIComponent(whatsappBericht)}`, '_blank');
-        };
-    }
-});
+    copyBtn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(linkInput.value);
+            copyBtn.textContent = 'Gekopieerd!';
+            setTimeout(() => { copyBtn.textContent = 'Kopieer link'; }, 1500);
+        } catch {
+            linkInput.select();
+            document.execCommand('copy');
+        }
+    });
+})();
