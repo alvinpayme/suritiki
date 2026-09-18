@@ -6,40 +6,117 @@
     <title>Suritiki - Betaalverzoek</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-        .card { background: white; width: 100%; max-width: 400px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,.1); text-align: center; }
-        h1 { color: #059669; font-size: 24px; margin: 0 0 20px; }
-        .amount-box, .info-group { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
-        .amount { font-size: 36px; font-weight: 900; color: #1e293b; margin: 4px 0; }
-        .label { font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: .05em; margin: 0; text-transform: uppercase; }
-        .desc { font-size: 14px; color: #64748b; margin: 0; }
-        .info-group { text-align: left; margin-top: 24px; margin-bottom: 0; }
-        .info-val { font-size: 16px; font-weight: 600; color: #334155; margin: 2px 0 0; overflow-wrap: anywhere; }
-        .btn-abn { width: 100%; background: #006643; color: white; border: 0; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-        .btn-abn:hover { background: #004d32; }
-        .btn-abn:disabled { background: #94a3b8; cursor: not-allowed; }
-        #statusMessage { color: #dc2626; margin-top: 10px; font-weight: 600; font-size: 14px; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            padding: 28px 24px 24px;
+            border-radius: 22px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            text-align: center;
+        }
+        h1 {
+            color: #059669;
+            font-size: 28px;
+            margin: 0 0 18px;
+        }
+        .amount-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px 16px;
+            margin-bottom: 18px;
+        }
+        .label {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .amount {
+            margin: 0;
+            font-size: 42px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+        .desc {
+            margin: 10px 0 0;
+            font-size: 16px;
+            color: #334155;
+            font-weight: 600;
+        }
+        .meta {
+            margin: 18px 0 10px;
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .btn-pay {
+            width: 100%;
+            border: 0;
+            border-radius: 14px;
+            background: #059669;
+            color: white;
+            font: inherit;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 18px 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-pay:hover { background: #047857; }
+        .btn-pay:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        #statusMessage {
+            margin-top: 14px;
+            color: #dc2626;
+            font-size: 14px;
+            font-weight: 700;
+            min-height: 20px;
+        }
+        #loading {
+            font-size: 16px;
+            color: #475569;
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <main class="card">
-        <h1>Suritiki Betaalverzoek</h1>
+        <h1>Suritiki</h1>
+
         <div id="loading">Gegevens ophalen... 🔐</div>
-        <div id="paymentContent" hidden>
+
+        <div id="paymentContent" class="hidden">
             <div class="amount-box">
-                <p class="label">Te betalen bedrag (omgerekend)</p>
+                <p class="label">Te betalen</p>
                 <p class="amount" id="displayAmount">€ 0,00</p>
-                <p class="desc" id="displayDescription">-</p>
             </div>
-            <p class="label">Betaal veilig via de betaal-link</p>
-            <button class="btn-abn" id="payBtn" type="button">Open betaal-link 💳</button>
-            <div class="info-group">
-                <p class="label">Bestemd voor (in Suriname)</p>
-                <p class="info-val" id="displayTarget">-</p>
-            </div>
+
+            <p class="meta" id="displayDescription">Omschrijving: -</p>
+            <p class="meta" id="displayTarget">Bestemd voor: -</p>
+
+            <button class="btn-pay" id="payBtn" type="button">Betaal nu</button>
         </div>
+
         <div id="statusMessage" role="alert"></div>
     </main>
+
     <script src="config.js"></script>
     <script>
         (() => {
@@ -48,32 +125,56 @@
             const content = document.getElementById('paymentContent');
             const status = document.getElementById('statusMessage');
             const id = new URLSearchParams(window.location.search).get('id');
-            const fail = (message) => { loading.hidden = true; status.textContent = message; };
+
+            const fail = (message) => {
+                loading.classList.add('hidden');
+                status.textContent = message;
+            };
+
             if (!id) return fail('Ongeldige link. Er is geen betaal-ID gevonden.');
-            if (!config.SUPABASE_URL || !config.SUPABASE_KEY || config.SUPABASE_URL.includes('JOUW-PROJECT-REF')) return fail('De betaalpagina is nog niet geconfigureerd.');
+            if (!config.SUPABASE_URL || !config.SUPABASE_KEY || config.SUPABASE_URL.includes('JOUW-PROJECT-REF')) {
+                return fail('De betaalpagina is nog niet geconfigureerd.');
+            }
 
             const endpoint = `${config.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/betaalverzoeken?id=eq.${encodeURIComponent(id)}&select=*`;
-            fetch(endpoint, { headers: { apikey: config.SUPABASE_KEY, Authorization: `Bearer ${config.SUPABASE_KEY}` } })
-                .then(async (response) => {
-                    const data = await response.json().catch(() => null);
-                    if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`);
-                    return data;
-                })
-                .then((data) => {
-                    const verzoek = Array.isArray(data) ? data[0] : null;
-                    if (!verzoek) throw new Error('Betaalverzoek niet gevonden.');
-                    const amount = Number(verzoek.bedrag ?? verzoek.amount);
-                    document.getElementById('displayAmount').textContent = `€ ${Number.isFinite(amount) ? amount.toFixed(2).replace('.', ',') : '0,00'}`;
-                    document.getElementById('displayDescription').textContent = verzoek.omschrijving ?? verzoek.description ?? '-';
-                    document.getElementById('displayTarget').textContent = [verzoek.naam, verzoek.bank, verzoek.rekeningnummer].filter(Boolean).join(' · ') || verzoek.bestemd_voor || verzoek.target || '-';
-                    const paymentUrl = verzoek.betaallink ?? verzoek.payment_url ?? verzoek.tikkie_url;
-                    const button = document.getElementById('payBtn');
-                    if (!paymentUrl) { button.disabled = true; button.textContent = 'Geen betaal-link beschikbaar'; }
-                    else button.addEventListener('click', () => window.open(paymentUrl, '_blank', 'noopener,noreferrer'));
-                    loading.hidden = true;
-                    content.hidden = false;
-                })
-                .catch((error) => fail(error.message === 'Betaalverzoek niet gevonden.' ? error.message : 'De gegevens konden niet worden opgehaald.'));
+
+            fetch(endpoint, {
+                headers: {
+                    apikey: config.SUPABASE_KEY,
+                    Authorization: `Bearer ${config.SUPABASE_KEY}`
+                }
+            })
+            .then(async (response) => {
+                const data = await response.json().catch(() => null);
+                if (!response.ok) throw new Error(data?.message || `HTTP ${response.status}`);
+                return data;
+            })
+            .then((data) => {
+                const verzoek = Array.isArray(data) ? data[0] : null;
+                if (!verzoek) throw new Error('Betaalverzoek niet gevonden.');
+
+                const amount = Number(verzoek.bedrag ?? verzoek.amount ?? 0);
+                document.getElementById('displayAmount').textContent = `€ ${Number.isFinite(amount) ? amount.toFixed(2).replace('.', ',') : '0,00'}`;
+                document.getElementById('displayDescription').textContent = `Omschrijving: ${verzoek.omschrijving ?? verzoek.description ?? '-'}`;
+                document.getElementById('displayTarget').textContent = `Bestemd voor: ${[verzoek.naam, verzoek.bank, verzoek.rekeningnummer].filter(Boolean).join(' · ') || '-'}`;
+
+                const paymentUrl = verzoek.betaallink ?? verzoek.payment_url ?? verzoek.tikkie_url ?? '#';
+                const button = document.getElementById('payBtn');
+
+                if (!paymentUrl || paymentUrl === '#') {
+                    button.disabled = true;
+                    button.textContent = 'Geen betaal-link beschikbaar';
+                } else {
+                    button.addEventListener('click', () => window.open(paymentUrl, '_blank', 'noopener,noreferrer'));
+                }
+
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            })
+            .catch((error) => {
+                const message = error.message === 'Betaalverzoek niet gevonden.' ? error.message : 'De gegevens konden niet worden opgehaald.';
+                fail(message);
+            });
         })();
     </script>
 </body>
