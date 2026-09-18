@@ -2,28 +2,23 @@
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "sb_publishable_5GMOHN817SlzWPDo7SW8rw_ghHJhqFE"; 
 
-// We zoeken alle elementen op uit de HTML pagina
 const form = document.getElementById('paymentForm');
 const resultDiv = document.getElementById('result');
 const linkInput = document.getElementById('generatedLink');
 const copyBtn = document.getElementById('copyBtn');
 
-// Vaste wisselkoersen als basis
 const KOERS_SRD_NAAR_EUR = 1 / 35; 
 const KOERS_USD_NAAR_EUR = 0.92;
 
-// We maken dynamisch een WhatsApp-knop aan in de code
 const whatsappBtn = document.createElement('button');
 whatsappBtn.innerText = "Deel via WhatsApp 💬";
 whatsappBtn.style.backgroundColor = "#25D366"; 
 whatsappBtn.style.marginTop = "8px";
 resultDiv.appendChild(whatsappBtn);
 
-// Dit gebeurt er als je op de grote knop "Maak Suritiki Link" klikt
 form.addEventListener('submit', async function(e) {
     e.preventDefault(); 
 
-    // We pakken de ingevulde gegevens uit het formulier
     const name = document.getElementById('name').value;
     const originalAmount = parseFloat(document.getElementById('amount').value);
     const currency = document.getElementById('currency').value;
@@ -31,7 +26,6 @@ form.addEventListener('submit', async function(e) {
     const account = document.getElementById('account').value;
     const description = document.getElementById('description').value;
     
-    // WISSELKOERS BEREKENING
     let euroAmount = originalAmount;
     if (currency === 'SRD') {
         euroAmount = originalAmount * KOERS_SRD_NAAR_EUR;
@@ -40,9 +34,9 @@ form.addEventListener('submit', async function(e) {
     }
     euroAmount = parseFloat(euroAmount.toFixed(2));
 
-    // VEILIGHEIDSCHECK EN OPSLAG
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/betaalverzoeken`, {
+        // We sturen het hier direct en dwingend naar JOUW unieke database link!
+        const response = await fetch("https://supabase.co/rest/v1/betaalverzoeken", {
             method: 'POST',
             headers: {
                 'apikey': SUPABASE_KEY,
@@ -81,7 +75,6 @@ form.addEventListener('submit', async function(e) {
     }
 });
 
-// Code voor de gewone kopieerknop
 copyBtn.addEventListener('click', function() {
     linkInput.select();
     linkInput.setSelectionRange(0, 99999); 
