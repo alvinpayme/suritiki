@@ -6,115 +6,194 @@
     <title>Suritiki - Geld overmaken naar Suriname</title>
     <style>
         * { box-sizing: border-box; }
-        html, body { margin: 0; min-height: 100%; height: 100%; }
+        html, body { margin: 0; min-height: 100%; }
         body {
             position: relative;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 12px;
             overflow: hidden;
             font-family: Arial, sans-serif;
-            color: #fff;
-            background: linear-gradient(135deg, #075e54, #128c7e 50%, #25d366);
+            color: #ecfff7;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(62, 255, 185, 0.18), transparent 26%),
+                radial-gradient(circle at 80% 15%, rgba(34, 211, 238, 0.15), transparent 28%),
+                linear-gradient(135deg, #041d18 0%, #072f2a 28%, #0d5b4b 62%, #0dc990 100%);
         }
 
-        .money-layer {
-            position: absolute;
-            inset: 0;
+        .money-rain {
+            position: fixed;
+            inset: -90px 0 0;
+            z-index: 0;
             overflow: hidden;
             pointer-events: none;
-            opacity: .9;
+            filter: drop-shadow(0 0 12px rgba(153, 255, 204, .25));
         }
         .note {
             position: absolute;
-            width: 92px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid rgba(255,255,255,.65);
-            border-radius: 6px;
-            background: linear-gradient(135deg, #8fd694, #d8f3dc 48%, #61b86b);
-            color: #176b3a;
-            font-size: 25px;
-            font-weight: 900;
-            box-shadow: 0 5px 14px rgba(0,0,0,.2), inset 0 0 0 3px rgba(255,255,255,.25);
-            animation: drift 11s ease-in-out infinite;
+            top: -80px;
+            width: 90px;
+            height: 45px;
+            border-radius: 7px;
+            background: linear-gradient(135deg, rgba(207,255,224,0.92), rgba(122,224,147,0.95), rgba(36,145,83,0.98));
+            border: 1px solid rgba(255,255,255,0.7);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,.3);
+            animation: fall linear infinite;
         }
-        .note::before, .note::after {
+        .note::before {
             content: '€';
             position: absolute;
-            font-size: 11px;
-            opacity: .7;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            font-weight: 900;
+            color: rgba(8,63,33,.9);
         }
-        .note::before { top: 4px; left: 7px; }
-        .note::after { right: 7px; bottom: 4px; }
-        .note-1 { top: 9%; left: 5%; transform: rotate(-18deg); animation-delay: 0s; }
-        .note-2 { top: 15%; right: 5%; transform: rotate(16deg); animation-delay: 2s; }
-        .note-3 { bottom: 12%; left: 4%; transform: rotate(13deg); animation-delay: 4s; }
-        .note-4 { bottom: 15%; right: 4%; transform: rotate(-14deg); animation-delay: 6s; }
-        .note-5 { top: 45%; left: 1%; transform: rotate(-8deg) scale(.72); animation-delay: 1s; }
-        .note-6 { top: 48%; right: 1%; transform: rotate(10deg) scale(.72); animation-delay: 5s; }
+        .note::after {
+            content: '€';
+            position: absolute;
+            top: 5px;
+            left: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(8,63,33,.75);
+        }
+        .note-1 { left: 7%; animation-duration: 8s; animation-delay: -1s; transform: rotate(-18deg); }
+        .note-2 { left: 20%; animation-duration: 9.5s; animation-delay: -5s; transform: rotate(18deg) scale(.75); }
+        .note-3 { left: 74%; animation-duration: 10s; animation-delay: -2s; transform: rotate(18deg); }
+        .note-4 { left: 88%; animation-duration: 11.5s; animation-delay: -7s; transform: rotate(-15deg) scale(.72); }
+        .note-5 { left: 47%; animation-duration: 12.5s; animation-delay: -9s; transform: rotate(-10deg) scale(.68); }
 
-        @keyframes drift {
-            0%, 100% { margin-top: 0; }
-            50% { margin-top: -18px; }
+        @keyframes fall {
+            0% { transform: translate3d(0, -90px, 0) rotate(-20deg); opacity: 0; }
+            10% { opacity: .95; }
+            35% { transform: translate3d(35px, 32vh, 0) rotate(90deg); }
+            70% { transform: translate3d(-30px, 70vh, 0) rotate(200deg); opacity: .8; }
+            100% { transform: translate3d(45px, 115vh, 0) rotate(310deg); opacity: 0; }
         }
 
         .flyer {
             position: relative;
             z-index: 1;
-            width: 100%;
-            max-width: 500px;
-            padding: 16px 18px 14px;
+            width: min(92vw, 520px);
+            padding: 20px 20px 16px;
             text-align: center;
-            border: 3px solid #fff;
-            border-radius: 22px;
-            background: rgba(0, 0, 0, .22);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
-            backdrop-filter: blur(2px);
+            background: rgba(5, 30, 25, 0.42);
+            border: 1px solid rgba(130, 255, 210, 0.34);
+            border-radius: 24px;
+            box-shadow:
+                0 0 0 1px rgba(117,255,205,0.18),
+                0 18px 30px rgba(0,0,0,0.34),
+                0 0 28px rgba(58, 214, 166, 0.18);
+            backdrop-filter: blur(8px);
         }
-        .brand { margin: 0; font-size: clamp(30px, 9vw, 42px); font-weight: 900; letter-spacing: 1px; line-height: 1; text-transform: uppercase; text-shadow: 2px 2px 0 #075e54; }
-        .headline { margin: 8px 0 10px; font-size: clamp(17px, 4vw, 23px); font-weight: 800; line-height: 1.2; }
-        .intro { margin: 0 0 10px; font-size: 13px; line-height: 1.35; opacity: .96; }
-        .benefits { margin: 10px 0; padding: 9px 10px; border-radius: 11px; background: rgba(255,255,255,.16); font-size: 12px; line-height: 1.5; text-align: left; }
-        .callout { margin: 10px 0 8px; font-size: 14px; font-weight: 900; line-height: 1.2; }
-        .whatsapp-button { display: block; width: 100%; padding: 12px 10px; border-radius: 11px; background: #fff; color: #075e54; font-size: 16px; font-weight: 900; text-align: center; text-decoration: none; box-shadow: 0 4px 0 #cfeee5; }
-        .whatsapp-button:hover { transform: translateY(2px); box-shadow: 0 2px 0 #cfeee5; }
-        .small { margin: 8px 0 0; font-size: 11px; opacity: .9; }
+
+        .brand {
+            margin: 0;
+            font-size: clamp(30px, 8vw, 46px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            line-height: 1;
+            text-transform: uppercase;
+            color: #d8ffe8;
+            text-shadow:
+                0 0 14px rgba(108,255,205,0.65),
+                0 0 28px rgba(108,255,205,0.35),
+                2px 2px 0 rgba(4,22,18,0.7);
+        }
+        .headline {
+            margin: 10px 0 8px;
+            font-size: clamp(17px, 4vw, 24px);
+            font-weight: 800;
+            line-height: 1.2;
+            color: #effff8;
+        }
+        .intro {
+            margin: 0 0 10px;
+            font-size: 13px;
+            line-height: 1.35;
+            opacity: 0.95;
+            color: #d9fff0;
+        }
+        .benefits {
+            margin: 10px 0;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(154,255,220,0.18);
+            font-size: 12px;
+            line-height: 1.55;
+            text-align: left;
+            color: #eafff5;
+        }
+        .callout {
+            margin: 12px 0 8px;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1.2;
+            color: #d4fff3;
+            letter-spacing: 0.3px;
+        }
+        .whatsapp-button {
+            display: block;
+            width: 100%;
+            padding: 14px 12px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #d9fdf1 100%);
+            color: #0a5d4c;
+            font-size: 16px;
+            font-weight: 900;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 0 0 1px rgba(255,255,255,.45), 0 8px 18px rgba(0,0,0,.22), 0 0 18px rgba(128,255,197,.35);
+            transition: transform .15s ease;
+        }
+        .whatsapp-button:hover { transform: translateY(-1px); }
+        .small {
+            margin: 8px 0 0;
+            font-size: 11px;
+            opacity: .85;
+            color: #dcfff4;
+        }
 
         @media (max-height: 700px) {
             .flyer { padding: 12px 14px; }
-            .brand { font-size: 29px; }
+            .brand { font-size: 28px; }
             .headline { font-size: 16px; }
             .intro, .benefits { font-size: 11px; }
             .callout { font-size: 12px; }
             .whatsapp-button { font-size: 14px; padding: 10px; }
-            .note { width: 70px; height: 38px; font-size: 20px; }
+            .note { width: 68px; height: 35px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .note { animation: none; opacity: .25; }
         }
     </style>
 </head>
 <body>
-    <div class="money-layer" aria-hidden="true">
-        <span class="note note-1">€</span>
-        <span class="note note-2">€</span>
-        <span class="note note-3">€</span>
-        <span class="note note-4">€</span>
-        <span class="note note-5">€</span>
-        <span class="note note-6">€</span>
+    <div class="money-rain" aria-hidden="true">
+        <span class="note note-1"></span>
+        <span class="note note-2"></span>
+        <span class="note note-3"></span>
+        <span class="note note-4"></span>
+        <span class="note note-5"></span>
     </div>
 
     <main class="flyer">
         <h1 class="brand">Suritiki</h1>
         <p class="headline">Snel &amp; veilig geld overmaken naar Suriname?</p>
         <p class="intro">Geen ingewikkelde formulieren of dure kantoren. Regel je overboeking direct via WhatsApp.</p>
+
         <div class="benefits">
             ✅ Betalen met iDEAL in Nederland<br>
             ✅ Snel op de rekening van de ontvanger<br>
             ✅ Naar grote banken in Suriname
         </div>
+
         <p class="callout">👇 START JE OVERBOEKING VIA WHATSAPP 👇</p>
         <a class="whatsapp-button" href="https://wa.me/31626193693?text=Hoi%20Suritiki%2C%20ik%20wil%20gelijk%20een%20betaling%20naar%20Suriname%20regelen." target="_blank" rel="noopener noreferrer">💬 START VIA WHATSAPP</a>
         <p class="small">Je wordt direct doorgestuurd naar WhatsApp.</p>
