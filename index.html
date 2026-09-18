@@ -68,6 +68,16 @@
                 <label for="description">Omschrijving</label>
                 <input type="text" id="description" maxlength="200" placeholder="Bijv. Voor de boodschappen">
             </div>
+            <div class="field">
+                <label for="paymentLink">Tikkie-link</label>
+                <input
+                    type="url"
+                    id="paymentLink"
+                    required
+                    value="https://tikkie.me/pay/jabc81jr15mh2m97ovhd?utm_medium=qr"
+                    placeholder="https://tikkie.me/pay/..."
+                >
+            </div>
             <button class="submit" type="submit" id="submitBtn">Maak Suritiki-link</button>
             <p id="statusMessage" class="message" role="alert"></p>
         </form>
