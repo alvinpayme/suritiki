@@ -6,6 +6,7 @@
     const result = document.getElementById('result');
     const linkInput = document.getElementById('generatedLink');
     const copyBtn = document.getElementById('copyBtn');
+    const whatsappBtn = document.getElementById('whatsappBtn');
     const submitBtn = document.getElementById('submitBtn');
     const statusMessage = document.getElementById('statusMessage');
 
@@ -20,6 +21,7 @@
         event.preventDefault();
         statusMessage.textContent = '';
         result.classList.add('hidden');
+        whatsappBtn.classList.add('hidden');
 
         if (!isConfigured()) {
             showError('Vul eerst SUPABASE_URL en SUPABASE_KEY in config.js in.');
@@ -62,6 +64,8 @@
             const paymentUrl = new URL('betaal.html', window.location.href);
             paymentUrl.searchParams.set('id', record.id);
             linkInput.value = paymentUrl.href;
+            whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`Bekijk mijn Suritiki-betaalverzoek: ${paymentUrl.href}`)}`;
+            whatsappBtn.classList.remove('hidden');
             result.classList.remove('hidden');
         } catch (error) {
             showError(`Opslaan mislukt: ${error.message}`);
