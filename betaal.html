@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suritiki - Betaalverzoek</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: white; width: 100%; max-width: 400px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        h1 { color: #059669; font-size: 24px; font-weight: 800; margin: 0 0 20px 0; }
+        .amount-box { background-color: #f8fafc; border: 1px solid #f1f5f9; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .amount { font-size: 36px; font-weight: 900; color: #1e293b; margin: 4px 0; }
+        .label { font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.05em; margin: 0; text-transform: uppercase; }
+        .desc { font-size: 14px; color: #64748b; margin: 0; }
+        .info-group { text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 12px; position: relative; }
+        .info-val { font-size: 16px; font-weight: 600; color: #334155; margin: 2px 0 0 0; }
+        .btn-abn { width: 100%; background-color: #006643; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
+        .btn-abn:hover { background-color: #004d32; }
+        #statusMessage { font-size: 14px; color: #dc2626; margin-top: 10px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Suritiki Betaalverzoek</h1>
+        
+        <div id="loading">Gegevens veilig ophalen uit de kluis... 🔐</div>
+
+        <div id="paymentContent" style="display: none;">
+            <div class="amount-box">
+                <p class="label">Te betalen bedrag (omgerekend)</p>
+                <p class="amount" id="displayAmount">€ 0.00</p>
+                <p class="desc" id="displayDescription">-</p>
+            </div>
+
+            <p class="label" style="margin-bottom: 12px;">Betaal veilig via ABN AMRO</p>
+            <p style="font-size: 13px; color: #64748b; margin-top: 0;">Klik op de knop hieronder om direct via iDEAL/Tikkie te betalen aan de Suritiki-beheerder. Het geld wordt daarna direct uitgekeerd in Suriname.</p>
+
+            <button class="btn-abn" id="payBtn">Open ABN AMRO / Tikkie 💳</button>
+
+            <div class="info-group" style="margin-top: 24px;">
+                <p class="label">Bestemd voor (in Suriname):</p>
+                <p class="info-val" id="displayTarget">-</p>
+            </div>
+        </div>
+        
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        // DEZELFDE GEGEVENS ALS IN APP.JS OM CONTACT TE MAKEN MET DE KLUIS
+        const SUPABASE_URL = "https://supabase.co";
+        const SUPABASE_KEY = "sb_publishable_5GMOHN817SlzWPDo7SW8rw_ghHJhqFE"; 
+
+        // We halen het unieke ID-nummer uit de link
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordId = urlParams.get('id');
+
+        if (!recordId) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('statusMessage').innerText = "Ongeldige link. Er is geen betaal-ID gevonden.";
+        } else {
+            // We trekken de gegevens nu LIVE en veilig uit jouw database
+            fetch(`${SUPABASE_URL}/rest/v1/betaalverzoeken?id=eq.${recordId}`, {
+                method: 'GET',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const verzoek = data[0];
+
+                    document.getElementById('displayAmount').innerText = `€ ${Number(verzoek.bedrag ?? verzoek.amount ?? 0).toFixed(2)}`;
+                    document.getElementById('displayDescription').innerText = verzoek.omschrijving ?? verzoek.description ?? '-';
+                    document.getElementById('displayTarget').innerText = verzoek.bestemd_voor ?? verzoek.target ?? '-';
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('paymentContent').style.display = 'block';
+
+                    document.getElementById('payBtn').addEventListener('click', () => {
+                        const paymentUrl = verzoek.betaallink ?? verzoek.payment_url ?? verzoek.tikkie_url;
+                        if (paymentUrl) {
+                            window.open(paymentUrl, '_blank', 'noopener,noreferrer');
+                        } else {
+                            document.getElementById('statusMessage').innerText = 'Er is geen betaal-link beschikbaar.';
+                        }
+                    });
+                } else {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('statusMessage').innerText = 'Betaalverzoek niet gevonden.';
+                }
+            })
+            .catch(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('statusMessage').innerText = 'De gegevens konden niet worden opgehaald.';
+            });
+        }
+    </script>
+</body>
+</html>
