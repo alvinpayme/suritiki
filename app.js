@@ -1,13 +1,17 @@
 // HIER KOPPELEN WE JOUW ONLINE KLUIS
 const SUPABASE_URL = "https://supabase.co";
-// PLAK HIERONDER JOUW GEKOPIEERDE SLEUTEL TUSSEN DE AANHALINGSTEKENS:
-const SUPABASE_KEY = "sb_publishable_5GMOHN8l7S1zWPDo78W0rw_ghHJhqfE";
+const SUPABASE_KEY = "sb_publishable_5GMOHN817SlzWPDo7SW8rw_ghHJhqFE"; 
 
 // We zoeken alle elementen op uit de HTML pagina
 const form = document.getElementById('paymentForm');
 const resultDiv = document.getElementById('result');
 const linkInput = document.getElementById('generatedLink');
 const copyBtn = document.getElementById('copyBtn');
+
+// Vaste wisselkoersen als basis (deze kun je later live laten updaten)
+// Voorbeeld: 1 EUR = 35 SRD, 1 USD = 0.92 EUR
+const KOERS_SRD_NAAR_EUR = 1 / 35; 
+const KOERS_USD_NAAR_EUR = 0.92;
 
 // We maken dynamisch een WhatsApp-knop aan in de code
 const whatsappBtn = document.createElement('button');
@@ -22,12 +26,22 @@ form.addEventListener('submit', async function(e) {
 
     // We pakken de ingevulde gegevens uit het formulier
     const name = document.getElementById('name').value;
-    const amount = document.getElementById('amount').value;
+    const originalAmount = parseFloat(document.getElementById('amount').value);
     const currency = document.getElementById('currency').value;
     const bank = document.getElementById('bank').value;
     const account = document.getElementById('account').value;
     const description = document.getElementById('description').value;
     
+    // WISSELKOERS BEREKENING: We rekenen alles om naar Euro's voor jouw ABN AMRO
+    let euroAmount = originalAmount;
+    if (currency === 'SRD') {
+        euroAmount = originalAmount * KOERS_SRD_NAAR_EUR;
+    } else if (currency === 'USD') {
+        euroAmount = originalAmount * KOERS_USD_NAAR_EUR;
+    }
+    // Rond netjes af op 2 cijfers achter de komma (bijv. € 14,29)
+    euroAmount = parseFloat(euroAmount.toFixed(2));
+
     // VEILIGHEIDSCHECK EN OPSLAG: We sturen de gegevens nu écht naar je Supabase kluis!
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/betaalverzoeken`, {
@@ -40,7 +54,7 @@ form.addEventListener('submit', async function(e) {
             },
             body: JSON.stringify({
                 naam: name,
-                bedrag: parseFloat(amount),
+                bedrag: euroAmount, // We slaan het bedrag direct op in Euro's!
                 bank: bank,
                 rekeningnummer: account,
                 omschrijving: description
@@ -49,19 +63,18 @@ form.addEventListener('submit', async function(e) {
 
         const data = await response.json();
         
-        // Als het opslaan in de database is gelukt, maken we een unieke link met het ID uit de database
-        if (data && data[0]) {
-            const databaseId = data[0].id;
+        if (data && data.length > 0) {
+            const databaseId = data[0].id; // We pakken het unieke ID uit de database
             const currentUrl = window.location.href.replace('index.html', '');
             
-            // De link verwijst nu naar het unieke ID in je kluis, hackers kunnen hier niks aan veranderen!
+            // De unieke, veilige link voor de betaler
             const generatedLink = `${currentUrl}betaal.html?id=${databaseId}`;
             
             linkInput.value = generatedLink;
             resultDiv.classList.add('visible'); 
 
-            // We maken de kant-en-klare tekst voor WhatsApp
-            const whatsappBericht = `Hoi! Hier is een Suritiki betaalverzoek. Of je dit via de link wilt voldoen: ${generatedLink}`;
+            // We maken het WhatsApp-berichtje compleet met het originele bedrag ter info
+            const whatsappBericht = `Hoi! Hier is een Suritiki betaalverzoek van ${name}. Of je ${currency} ${originalAmount} (omgerekend € ${euroAmount}) wilt overmaken voor "${description || 'Betaalverzoek'}". Je kunt via deze link direct met iDEAL betalen: ${generatedLink}`;
             
             whatsappBtn.onclick = function() {
                 window.open(`https://whatsapp.com{encodeURIComponent(whatsappBericht)}`, '_blank');
@@ -79,8 +92,5 @@ copyBtn.addEventListener('click', function() {
     linkInput.setSelectionRange(0, 99999); 
     navigator.clipboard.writeText(linkInput.value);
     
-    copyBtn.innerText = "Gekopieerd! ✅";
-    setTimeout(() => {
-        copyBtn.innerText = "Kopieer link";
-    }, 2000);
+    copyBtn.innerText = "Gekopieerd!";
 });
