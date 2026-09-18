@@ -16,7 +16,7 @@
         input, select { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font: inherit; }
         input:focus, select:focus { outline: 2px solid #34d399; border-color: #10b981; }
         .amount-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
-        button { width: 100%; border: 0; border-radius: 10px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; }
+        button, .whatsapp { width: 100%; border: 0; border-radius: 10px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: block; }
         .submit { background: #059669; color: #fff; }
         .submit:hover { background: #047857; }
         button:disabled { opacity: .65; cursor: wait; }
@@ -24,7 +24,9 @@
         .hidden { display: none; }
         .result-title { color: #065f46; font-weight: 700; margin: 0 0 8px; }
         #generatedLink { background: #fff; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
-        .copy { background: #1e293b; color: #fff; font-size: 14px; }
+        .copy { background: #1e293b; color: #fff; margin-bottom: 10px; }
+        .whatsapp { background: #25d366; color: #fff; }
+        .whatsapp:hover { background: #1da851; }
         .message { margin: 12px 0 0; color: #b91c1c; font-size: 14px; font-weight: 600; }
     </style>
 </head>
@@ -74,6 +76,7 @@
             <p class="result-title">Jouw Suritiki-link is klaar! 🎉</p>
             <input type="text" id="generatedLink" readonly aria-label="Gegenereerde link">
             <button id="copyBtn" class="copy" type="button">Kopieer link</button>
+            <a id="whatsappBtn" class="whatsapp hidden" href="#" target="_blank" rel="noopener noreferrer">Deel via WhatsApp</a>
         </section>
     </main>
     <script src="config.js"></script>
