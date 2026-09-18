@@ -30,7 +30,7 @@
         event.preventDefault();
         statusMessage.textContent = '';
         result.classList.add('hidden');
-        whatsappBtn.classList.add('hidden');
+        if (whatsappBtn) whatsappBtn.classList.add('hidden');
 
         if (!isConfigured()) {
             showError('Controleer SUPABASE_URL en SUPABASE_KEY in config.js.');
@@ -39,9 +39,11 @@
 
         const name = document.getElementById('name').value.trim();
         const account = document.getElementById('account').value.trim();
+        const paymentLink = document.getElementById('paymentLink')?.value.trim() || '';
         const originalAmount = Number.parseFloat(document.getElementById('amount').value);
-        if (!name || !account || !Number.isFinite(originalAmount) || originalAmount <= 0) {
-            showError('Vul alle verplichte velden en een geldig bedrag in.');
+
+        if (!name || !account || !paymentLink || !Number.isFinite(originalAmount) || originalAmount <= 0) {
+            showError('Vul alle verplichte velden in, inclusief een geldige Tikkie-link.');
             return;
         }
 
@@ -54,7 +56,8 @@
             bedrag: euroAmount,
             bank: document.getElementById('bank').value,
             rekeningnummer: account,
-            omschrijving: document.getElementById('description').value.trim()
+            omschrijving: document.getElementById('description').value.trim(),
+            betaallink: paymentLink
         };
 
         submitBtn.disabled = true;
@@ -76,14 +79,16 @@
                 throw new Error(detail);
             }
 
-            // The ID is generated before saving, so it is available even when
-            // the REST response contains no representation because of API settings.
             const savedId = data?.[0]?.id || data?.id || id;
             const paymentUrl = new URL('betaal.html', window.location.href);
             paymentUrl.searchParams.set('id', savedId);
             linkInput.value = paymentUrl.href;
-            whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`Bekijk mijn Suritiki-betaalverzoek: ${paymentUrl.href}`)}`;
-            whatsappBtn.classList.remove('hidden');
+
+            if (whatsappBtn) {
+                whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`Bekijk mijn Suritiki-betaalverzoek: ${paymentUrl.href}`)}`;
+                whatsappBtn.classList.remove('hidden');
+            }
+
             result.classList.remove('hidden');
         } catch (error) {
             showError(`Opslaan mislukt: ${error.message}`);
@@ -92,14 +97,16 @@
         }
     });
 
-    copyBtn.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(linkInput.value);
-            copyBtn.textContent = 'Gekopieerd!';
-            setTimeout(() => { copyBtn.textContent = 'Kopieer link'; }, 1500);
-        } catch {
-            linkInput.select();
-            document.execCommand('copy');
-        }
-    });
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(linkInput.value);
+                copyBtn.textContent = 'Gekopieerd!';
+                setTimeout(() => { copyBtn.textContent = 'Kopieer link'; }, 1500);
+            } catch {
+                linkInput.select();
+                document.execCommand('copy');
+            }
+        });
+    }
 })();
