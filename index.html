@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
-        .card { background: #fff; width: 100%; max-width: 420px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(15, 23, 42, .12); }
+        .card { background: #fff; width: 100%; max-width: 420px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12); }
         h1 { margin: 0 0 6px; font-size: 30px; color: #059669; }
         .intro { margin: 0 0 20px; color: #64748b; font-size: 14px; }
         .field { margin-bottom: 16px; }
@@ -35,16 +35,54 @@
     <main class="card">
         <h1>Suritiki</h1>
         <p class="intro">Maak makkelijk een betaalverzoek voor Suriname en Nederland.</p>
+
         <form id="paymentForm">
-            <div class="field"><label for="name">Jouw naam (ontvanger)</label><input id="name" type="text" required placeholder="Bijv. Deelsy"></div>
-            <div class="field"><label for="amount">Bedrag</label><div class="amount-row"><input id="amount" type="number" step="0.01" min="0.01" required placeholder="0,00"><select id="currency" aria-label="Valuta"><option value="SRD">SRD</option><option value="EUR">EUR</option><option value="USD">USD</option></select></div></div>
-            <div class="field"><label for="bank">Jouw bank (in Suriname)</label><select id="bank"><option value="DSB">De Surinaamsche Bank (DSB)</option><option value="Hakrinbank">Hakrinbank</option><option value="Republic Bank">Republic Bank</option><option value="Fina Bank">Fina Bank</option></select></div>
-            <div class="field"><label for="account">Jouw rekeningnummer</label><input id="account" type="text" required placeholder="Bijv. 12.34.56.789"></div>
-            <div class="field"><label for="description">Omschrijving</label><input id="description" type="text" maxlength="200" placeholder="Bijv. Voor de boodschappen"></div>
-            <div class="field"><label for="paymentUrl">Tikkie-link (optioneel)</label><input id="paymentUrl" type="url" placeholder="https://tikkie.me/pay/..."></div>
+            <div class="field">
+                <label for="name">Jouw naam (ontvanger)</label>
+                <input id="name" type="text" required placeholder="Bijv. Deelsy">
+            </div>
+
+            <div class="field">
+                <label for="amount">Bedrag</label>
+                <div class="amount-row">
+                    <input id="amount" type="number" step="0.01" min="0.01" required placeholder="0,00">
+                    <select id="currency" aria-label="Valuta">
+                        <option value="SRD">SRD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="bank">Jouw bank (in Suriname)</label>
+                <select id="bank">
+                    <option value="DSB">De Surinaamsche Bank (DSB)</option>
+                    <option value="Hakrinbank">Hakrinbank</option>
+                    <option value="Republic Bank">Republic Bank</option>
+                    <option value="Fina Bank">Fina Bank</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="account">Jouw rekeningnummer</label>
+                <input id="account" type="text" required placeholder="Bijv. 12.34.56.789">
+            </div>
+
+            <div class="field">
+                <label for="description">Omschrijving</label>
+                <input id="description" type="text" maxlength="200" placeholder="Bijv. Voor de boodschappen">
+            </div>
+
+            <div class="field">
+                <label for="paymentUrl">Tikkie-link (optioneel)</label>
+                <input id="paymentUrl" type="url" placeholder="https://tikkie.me/pay/...">
+            </div>
+
             <button id="submitBtn" type="submit" class="submit">Maak Suritiki-link</button>
             <p id="statusMessage" class="message" role="alert"></p>
         </form>
+
         <section id="result" class="result hidden" aria-live="polite">
             <p class="result-title">Jouw Suritiki-link is klaar! 🎉</p>
             <input id="generatedLink" type="text" readonly aria-label="Gegenereerde link">
@@ -52,6 +90,7 @@
             <button id="whatsappBtn" type="button" class="whatsapp">Deel via WhatsApp</button>
         </section>
     </main>
+
     <script src="config.js"></script>
     <script src="app.js"></script>
 </body>
