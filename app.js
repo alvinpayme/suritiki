@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://<jouw-project-id>.supabase.co";
-const SUPABASE_KEY = "<anon_key>";
+const SUPABASE_KEY = "<https://gbnqhzczwqpjiklbockm.supabase.co/rest/v1/>";
 
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
