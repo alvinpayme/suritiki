@@ -24,44 +24,6 @@
             overflow: hidden;
         }
 
-        .bg-layer {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            filter: blur(.2px);
-        }
-
-        .float-logo {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.18);
-            background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.18);
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            box-shadow: inset 0 0 24px rgba(255,255,255,0.04), 0 0 18px rgba(255,255,255,0.05);
-            animation: float 12s ease-in-out infinite;
-        }
-
-        .float-1 { top: 10%; left: 10%; animation-delay: 0s; }
-        .float-2 { top: 18%; right: 12%; animation-delay: 1.8s; }
-        .float-3 { bottom: 16%; left: 16%; animation-delay: 3.2s; }
-        .float-4 { bottom: 20%; right: 18%; animation-delay: 5.2s; }
-        .float-5 { top: 48%; left: 4%; animation-delay: 2.4s; }
-        .float-6 { top: 52%; right: 6%; animation-delay: 4.6s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
-            50% { transform: translateY(-12px) rotate(5deg) scale(1.06); }
-        }
-
         .flyer {
             position: relative;
             z-index: 1;
@@ -138,20 +100,10 @@
             .intro, .benefits { font-size: 11px; }
             .callout { font-size: 12px; }
             .whatsapp-button { font-size: 14px; padding: 10px; }
-            .float-logo { width: 50px; height: 50px; font-size: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-layer" aria-hidden="true">
-        <span class="float-logo float-1">S</span>
-        <span class="float-logo float-2">S</span>
-        <span class="float-logo float-3">S</span>
-        <span class="float-logo float-4">S</span>
-        <span class="float-logo float-5">S</span>
-        <span class="float-logo float-6">S</span>
-    </div>
-
     <main class="flyer">
         <h1 class="brand">Suritiki</h1>
         <p class="headline">Snel &amp; veilig geld overmaken naar Suriname?</p>
