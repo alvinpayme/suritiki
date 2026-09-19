@@ -42,31 +42,13 @@
             box-shadow: 0 10px 18px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,.3);
             animation: fall linear infinite;
         }
-        .note::before {
-            content: '€';
-            position: absolute;
-            inset: 0;
-            display: grid;
-            place-items: center;
-            font-size: 24px;
-            font-weight: 900;
-            color: rgba(8,63,33,.9);
-        }
-        .note::after {
-            content: '€';
-            position: absolute;
-            top: 5px;
-            left: 8px;
-            font-size: 9px;
-            font-weight: 700;
-            color: rgba(8,63,33,.75);
-        }
+        .note::before { content: '€'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 24px; font-weight: 900; color: rgba(8,63,33,.9); }
+        .note::after { content: '€'; position: absolute; top: 5px; left: 8px; font-size: 9px; font-weight: 700; color: rgba(8,63,33,.75); }
         .note-1 { left: 7%; animation-duration: 8s; animation-delay: -1s; transform: rotate(-18deg); }
         .note-2 { left: 20%; animation-duration: 9.5s; animation-delay: -5s; transform: rotate(18deg) scale(.75); }
         .note-3 { left: 74%; animation-duration: 10s; animation-delay: -2s; transform: rotate(18deg); }
         .note-4 { left: 88%; animation-duration: 11.5s; animation-delay: -7s; transform: rotate(-15deg) scale(.72); }
         .note-5 { left: 47%; animation-duration: 12.5s; animation-delay: -9s; transform: rotate(-10deg) scale(.68); }
-
         @keyframes fall {
             0% { transform: translate3d(0, -90px, 0) rotate(-20deg); opacity: 0; }
             10% { opacity: .95; }
@@ -84,80 +66,16 @@
             background: rgba(5, 30, 25, 0.42);
             border: 1px solid rgba(130, 255, 210, 0.34);
             border-radius: 24px;
-            box-shadow:
-                0 0 0 1px rgba(117,255,205,0.18),
-                0 18px 30px rgba(0,0,0,0.34),
-                0 0 28px rgba(58, 214, 166, 0.18);
+            box-shadow: 0 0 0 1px rgba(117,255,205,0.18), 0 18px 30px rgba(0,0,0,0.34), 0 0 28px rgba(58, 214, 166, 0.18);
             backdrop-filter: blur(8px);
         }
-
-        .brand {
-            margin: 0;
-            font-size: clamp(30px, 8vw, 46px);
-            font-weight: 900;
-            letter-spacing: 2px;
-            line-height: 1;
-            text-transform: uppercase;
-            color: #d8ffe8;
-            text-shadow:
-                0 0 14px rgba(108,255,205,0.65),
-                0 0 28px rgba(108,255,205,0.35),
-                2px 2px 0 rgba(4,22,18,0.7);
-        }
-        .headline {
-            margin: 10px 0 8px;
-            font-size: clamp(17px, 4vw, 24px);
-            font-weight: 800;
-            line-height: 1.2;
-            color: #effff8;
-        }
-        .intro {
-            margin: 0 0 10px;
-            font-size: 13px;
-            line-height: 1.35;
-            opacity: 0.95;
-            color: #d9fff0;
-        }
-        .benefits {
-            margin: 10px 0;
-            padding: 10px 12px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(154,255,220,0.18);
-            font-size: 12px;
-            line-height: 1.55;
-            text-align: left;
-            color: #eafff5;
-        }
-        .callout {
-            margin: 12px 0 8px;
-            font-size: 14px;
-            font-weight: 900;
-            line-height: 1.2;
-            color: #d4fff3;
-            letter-spacing: 0.3px;
-        }
-        .whatsapp-button {
-            display: block;
-            width: 100%;
-            padding: 14px 12px;
-            border-radius: 14px;
-            background: linear-gradient(180deg, #ffffff 0%, #d9fdf1 100%);
-            color: #0a5d4c;
-            font-size: 16px;
-            font-weight: 900;
-            text-align: center;
-            text-decoration: none;
-            box-shadow: 0 0 0 1px rgba(255,255,255,.45), 0 8px 18px rgba(0,0,0,.22), 0 0 18px rgba(128,255,197,.35);
-            transition: transform .15s ease;
-        }
-        .whatsapp-button:hover { transform: translateY(-1px); }
-        .small {
-            margin: 8px 0 0;
-            font-size: 11px;
-            opacity: .85;
-            color: #dcfff4;
-        }
+        .brand { margin: 0; font-size: clamp(30px, 8vw, 46px); font-weight: 900; letter-spacing: 2px; line-height: 1; text-transform: uppercase; color: #d8ffe8; text-shadow: 0 0 14px rgba(108,255,205,0.65), 0 0 28px rgba(108,255,205,0.35), 2px 2px 0 rgba(4,22,18,0.7); }
+        .headline { margin: 10px 0 8px; font-size: clamp(17px, 4vw, 24px); font-weight: 800; line-height: 1.2; color: #effff8; }
+        .intro { margin: 0 0 10px; font-size: 13px; line-height: 1.35; opacity: 0.95; color: #d9fff0; }
+        .benefits { margin: 10px 0; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(154,255,220,0.18); font-size: 12px; line-height: 1.55; text-align: left; color: #eafff5; }
+        .callout { margin: 12px 0 8px; font-size: 14px; font-weight: 900; line-height: 1.2; color: #d4fff3; letter-spacing: 0.3px; }
+        .status { margin: 0; padding: 13px 12px; border: 1px solid rgba(154,255,220,0.25); border-radius: 14px; background: rgba(255,255,255,0.08); color: #eafff5; font-size: 14px; font-weight: 800; }
+        .small { margin: 8px 0 0; font-size: 11px; opacity: .85; color: #dcfff4; }
 
         @media (max-height: 700px) {
             .flyer { padding: 12px 14px; }
@@ -165,38 +83,29 @@
             .headline { font-size: 16px; }
             .intro, .benefits { font-size: 11px; }
             .callout { font-size: 12px; }
-            .whatsapp-button { font-size: 14px; padding: 10px; }
+            .status { font-size: 12px; padding: 10px; }
             .note { width: 68px; height: 35px; }
         }
-
-        @media (prefers-reduced-motion: reduce) {
-            .note { animation: none; opacity: .25; }
-        }
+        @media (prefers-reduced-motion: reduce) { .note { animation: none; opacity: .25; } }
     </style>
 </head>
 <body>
     <div class="money-rain" aria-hidden="true">
-        <span class="note note-1"></span>
-        <span class="note note-2"></span>
-        <span class="note note-3"></span>
-        <span class="note note-4"></span>
-        <span class="note note-5"></span>
+        <span class="note note-1"></span><span class="note note-2"></span><span class="note note-3"></span><span class="note note-4"></span><span class="note note-5"></span>
     </div>
 
     <main class="flyer">
         <h1 class="brand">Suritiki</h1>
         <p class="headline">Snel &amp; veilig geld overmaken naar Suriname?</p>
         <p class="intro">Geen ingewikkelde formulieren of dure kantoren. Regel je overboeking direct via WhatsApp.</p>
-
         <div class="benefits">
             ✅ Betalen met iDEAL in Nederland<br>
             ✅ Snel op de rekening van de ontvanger<br>
             ✅ Naar grote banken in Suriname
         </div>
-
         <p class="callout">👇 START JE OVERBOEKING VIA WHATSAPP 👇</p>
-        <a class="whatsapp-button" href="https://wa.me/31626193693?text=Hoi%20Suritiki%2C%20ik%20wil%20gelijk%20een%20betaling%20naar%20Suriname%20regelen." target="_blank" rel="noopener noreferrer">💬 START VIA WHATSAPP</a>
-        <p class="small">Je wordt direct doorgestuurd naar WhatsApp.</p>
+        <p class="status">Contact via WhatsApp is tijdelijk niet beschikbaar.</p>
+        <p class="small">De contactgegevens worden binnenkort bijgewerkt.</p>
     </main>
 </body>
 </html>
